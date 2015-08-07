@@ -87,6 +87,9 @@ type EventSource interface {
 	// consumers count
 	ConsumersCount() int
 
+	//live consumers count
+	LiveConsumersCount() int
+
 	// close and clear all consumers
 	Close()
 }
@@ -245,4 +248,18 @@ func (es *eventSource) ConsumersCount() int {
 	defer es.consumersLock.RUnlock()
 
 	return es.consumers.Len()
+}
+
+func (es *eventSource) LiveConsumersCount() int {
+	es.consumersLock.RLock()
+	defer es.consumersLock.RUnlock()
+
+	ans := 0
+	for e := es.consumers.Front(); e != nil; e = e.Next() {
+		if !e.Value.(*consumer).staled {
+			ans++
+		}
+	}
+
+	return ans
 }
