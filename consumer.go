@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"fmt"
 )
 
 type consumer struct {
@@ -97,7 +98,11 @@ func newConsumer(resp http.ResponseWriter, req *http.Request, es *eventSource) (
 
 	go func() {
 		idleTimer := time.NewTimer(es.idleTimeout)
-		defer idleTimer.Stop()
+		defer func (){
+			idleTimer.Stop()
+			fmt.Println("客户端关闭连接, consumer func defer")
+			es.onConsumerClose() // call the callback
+		} ()
 		for {
 			select {
 			case message, open := <-consumer.in:

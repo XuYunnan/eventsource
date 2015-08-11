@@ -34,6 +34,7 @@ type eventSource struct {
 	closeOnTimeout bool
 	gzip           bool
 
+	onConsumerClose func()
 	consumersLock sync.RWMutex
 	consumers     *list.List
 }
@@ -92,6 +93,9 @@ type EventSource interface {
 
 	// close and clear all consumers
 	Close()
+	
+	//
+	SetOnClose(f func())
 }
 
 type message interface {
@@ -167,6 +171,7 @@ func controlProcess(es *eventSource) {
 				es.consumers.PushBack(c)
 			}()
 		case c := <-es.staled:
+			//fmt.Println("关闭了一个客户端连接")
 			toRemoveEls := make([]*list.Element, 0, 1)
 			func() {
 				es.consumersLock.RLock()
@@ -208,11 +213,14 @@ func New(settings *Settings, customHeadersFunc func(*http.Request) [][]byte) Eve
 	es.idleTimeout = settings.IdleTimeout
 	es.closeOnTimeout = settings.CloseOnTimeout
 	es.gzip = settings.Gzip
+	es.onConsumerClose = func(){} // init : do nothing
+	
 	go controlProcess(es)
 	return es
 }
 
 func (es *eventSource) Close() {
+	//fmt.Println("eventsource close函数被调用")
 	es.close <- true
 }
 
@@ -262,4 +270,8 @@ func (es *eventSource) LiveConsumersCount() int {
 	}
 
 	return ans
+}
+
+func (es *eventSource) SetOnClose(f func()){
+	es.onConsumerClose = f
 }
