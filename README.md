@@ -4,6 +4,9 @@
 
 _eventsource_ provides server-sent events for net/http server.
 
+## 增加的功能
+增加了 onConsumerClose 这个回调函数，在一次sendEventMessage失败的时候，被调用～，其他的功能保持不变。
+
 ## Usage
 
 ### SSE with default options
