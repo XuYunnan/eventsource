@@ -24,7 +24,7 @@ func (hh HttpHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	go func(){
 		i := 0
 		for{
-			time.Sleep(2*time.Second)
+			time.Sleep(10*time.Second)
 			hh.es.SendEventMessage("11","init",strconv.Itoa(i))
 			i++
 			//fmt.Println("CC and Lcc ",hh.es.ConsumersCount() , hh.es.LiveConsumersCount())

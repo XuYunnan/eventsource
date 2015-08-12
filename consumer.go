@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
-	"fmt"
+	//"fmt"
 )
 
 type consumer struct {
@@ -100,7 +100,7 @@ func newConsumer(resp http.ResponseWriter, req *http.Request, es *eventSource) (
 		idleTimer := time.NewTimer(es.idleTimeout)
 		defer func (){
 			idleTimer.Stop()
-			fmt.Println("客户端关闭连接, consumer func defer")
+			//fmt.Println("客户端关闭连接, consumer func defer")
 			es.onConsumerClose() // call the callback
 		} ()
 		for {
